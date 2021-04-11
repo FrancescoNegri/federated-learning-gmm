@@ -14,13 +14,13 @@ from gmm import GaussianMixture
 
 if __name__ == '__main__':    
     args = parse_args(is_federated=False)
-    if args.random_seed: random.seed(int(args.random_seed))
+    if args.seed: random.seed(int(args.seed))
 
     train_dataset, train_dataset_labels, _ = get_dataset(args)
 
     print('\n')
     seed = None
-    if args.random_seed: seed = (int(args.random_seed))
+    if args.seed: seed = (int(args.seed))
     global_model = GaussianMixture(
         X=train_dataset,
         n_components=args.components,
@@ -59,8 +59,8 @@ if __name__ == '__main__':
 
     dir_name = os.path.join(dir, path, filename)
     fig, axs = plt.subplots(1, 2)
-    plot_PCA_2(axs[0], train_dataset, train_dataset_labels, 'Dataset Clusters', random_seed=args.random_seed)
-    plot_PCA_2(axs[1], train_dataset, predicted_labels, 'Predicted Clusters', random_seed=args.random_seed)
+    plot_PCA_2(axs[0], train_dataset, train_dataset_labels, 'Dataset Clusters', random_state=args.seed)
+    plot_PCA_2(axs[1], train_dataset, predicted_labels, 'Predicted Clusters', random_state=args.seed)
     fig.tight_layout()
     fig.savefig(dir_name, dpi=300)
 

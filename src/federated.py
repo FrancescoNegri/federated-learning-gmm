@@ -12,7 +12,7 @@ from args_parser import parse_args
 
 if __name__ == '__main__':    
     args = parse_args(is_federated=True)
-    if args.random_seed: random.seed(int(args.random_seed))
+    if args.seed: random.seed(int(args.seed))
     
     output_dir = prepare_output_dir()   
 
@@ -57,8 +57,8 @@ if __name__ == '__main__':
         ax2 = fig.add_subplot(1, 2, 2)
         pca_components = 2
 
-    plot_PCA(ax1, train_dataset, train_dataset_labels, pca_components, args.soft, 'Dataset Clusters', random_seed=args.random_seed)
-    plot_PCA(ax2, train_dataset, predicted_labels, pca_components, args.soft, 'Predicted Clusters', random_seed=args.random_seed)
+    plot_PCA(ax1, train_dataset, train_dataset_labels, pca_components, args.soft, 'Dataset Clusters', random_state=args.seed)
+    plot_PCA(ax2, train_dataset, predicted_labels, pca_components, args.soft, 'Predicted Clusters', random_state=args.seed)
     fig.savefig(dir_name, dpi=300)
     plt.close(fig)
 

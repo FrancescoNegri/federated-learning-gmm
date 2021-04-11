@@ -9,7 +9,7 @@ from utils import plot_PCA
 class Server():
     def __init__(self, args, init_dataset, clients, output_dir):
         self.random_state = None
-        if args.random_seed: self.random_state = (int(args.random_seed))
+        if args.seed: self.random_state = (int(args.seed))
         self.model =  GaussianMixture(
             X=init_dataset,
             n_components=args.components,
@@ -111,8 +111,8 @@ class Server():
             ax2 = fig.add_subplot(1, 2, 2)
             pca_components = 2
 
-        plot_PCA(ax1, X, labels, pca_components, self.args.soft, 'Dataset Clusters', random_seed=self.random_state)
-        plot_PCA(ax2, X, self.predict(X), pca_components, self.args.soft, 'Predicted Clusters', random_seed=self.random_state)
+        plot_PCA(ax1, X, labels, pca_components, self.args.soft, 'Dataset Clusters', random_state=self.random_state)
+        plot_PCA(ax2, X, self.predict(X), pca_components, self.args.soft, 'Predicted Clusters', random_state=self.random_state)
         fig.savefig(dir_name, dpi=150)
         plt.close(fig)
 

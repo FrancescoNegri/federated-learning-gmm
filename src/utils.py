@@ -44,8 +44,8 @@ def get_dataset(args):
 
     elif args.dataset == 'blob':
         seed = None
-        if args.random_seed:
-            seed = int(args.random_seed)
+        if args.seed:
+            seed = int(args.seed)
         data, labels = datasets.make_blobs(
             n_samples=args.samples,
             n_features=args.features,
@@ -218,14 +218,14 @@ def exp_details(args):
     print(f'    Local Epochs       : {args.local_ep}\n')
     return
 
-def plot_PCA(ax, X, labels, pca_components=2, soft_clustering=True, title=None, random_seed=None):  
+def plot_PCA(ax, X, labels, pca_components=2, soft_clustering=True, title=None, random_state=None):  
     if X.shape[1] > 1:  
         if pca_components > 2: pca_components = 3
         else: pca_components = 2
 
-        if random_seed:
-            random_seed = int(random_seed)
-        pca = PCA(n_components=pca_components, random_state=random_seed)
+        if random_state:
+            random_state = int(random_state)
+        pca = PCA(n_components=pca_components, random_state=random_state)
         pca.fit(X)
         pca_data = pca.transform(X)
 
@@ -353,8 +353,8 @@ def extract_img_features(args, files, n_features=None):
 
     if n_features:
         seed = None
-        if args.random_seed:
-            seed = int(args.random_seed)
+        if args.seed:
+            seed = int(args.seed)
         pca = PCA(n_components=n_features, random_state=seed)
         pca.fit(features)
         features = pca.transform(features)

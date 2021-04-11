@@ -44,7 +44,7 @@ def parse_common(parser):
         '--components', type=int, default=3, help="Number of Gaussians to fit."
     )
     parser.add_argument(
-        '--random_seed', default=None, help="Number to have random consistent results across executions."
+        '--seed', default=None, help="Number to have random consistent results across executions."
     )
     # parser.add_argument(
     #     '--path', default=None, help="Path of the custom dataset to use."
