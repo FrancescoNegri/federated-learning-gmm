@@ -1,0 +1,12 @@
+.DS_Store
+/src/__pycache__
+
+# Output
+/output
+
+# Datasets
+/data
+
+# Test
+/test
+/notebooks
