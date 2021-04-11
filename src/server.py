@@ -62,6 +62,9 @@ class Server():
             pbar.set_description('Round: {}/{} | Client: {}'.format(round+1, self.rounds, client.id))
             round_history[client.id] = client.fit(self.model)
 
+            if pbar.iterable[-1] == client:
+                pbar.set_description('Round: {}/{} | Completed'.format(round+1, self.rounds))
+        
         self._set_parameters_from_clients_models(round_history)
 
     def average_clients_models(self):
