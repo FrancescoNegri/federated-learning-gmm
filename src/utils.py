@@ -63,7 +63,8 @@ def get_dataset(args):
         train_dataset_labels = labels
 
         #IID
-        user_groups = sample_iid(train_dataset, args.K)
+        user_groups = None
+        if hasattr(args, 'K'): user_groups = sample_iid(train_dataset, args.K)
 
     elif args.dataset == 'custom':
         if args.path:
