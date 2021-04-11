@@ -13,7 +13,7 @@ The Gaussian Mixture Model is employed in unsupervised learning problems, especi
 | `--random_seed` | Number to have random consistent results across executions. | _None_| X | X |
 | `--samples` | Number of samples to generate. | _10000_ | X | X |
 | `--features` | Number of features for each generated sample. | _2_ | X | X |
-| `--soft_clustering` | Specifies if cluster bounds are soft or hard. | _True_ | X | X |
+| `--soft` | Specifies if cluster bounds are soft or hard. | _True_ | X | X |
 | `--plots_3d` | Specifies if plots are to be done in 3D or 2D. | _False_ | X | X |
 | `--epochs` | Number of epochs of training. | _100_ | X |  |
 | `--rounds` | Number of rounds of training. | _10_ |  | X |
