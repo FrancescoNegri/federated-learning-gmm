@@ -111,8 +111,8 @@ class Server():
             ax2 = fig.add_subplot(1, 2, 2)
             pca_components = 2
 
-        plot_PCA(ax1, X, labels, pca_components, self.args.soft_clustering, 'Dataset Clusters', random_seed=self.random_state)
-        plot_PCA(ax2, X, self.predict(X), pca_components, self.args.soft_clustering, 'Predicted Clusters', random_seed=self.random_state)
+        plot_PCA(ax1, X, labels, pca_components, self.args.soft, 'Dataset Clusters', random_seed=self.random_state)
+        plot_PCA(ax2, X, self.predict(X), pca_components, self.args.soft, 'Predicted Clusters', random_seed=self.random_state)
         fig.savefig(dir_name, dpi=150)
         plt.close(fig)
 

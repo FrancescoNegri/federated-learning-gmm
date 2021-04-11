@@ -56,7 +56,7 @@ def parse_common(parser):
         '--features', type=int, default=2, help="Number of features for each generated sample."
     )
     parser.add_argument(
-        '--soft_clustering', type=int, default=1, help="Specifies if cluster bounds are soft or hard."
+        '--soft', type=int, default=1, help="Specifies if cluster bounds are soft or hard."
     )
     parser.add_argument(
         '--plots_3d', type=int, default=0, help="Specifies if plots are to be done in 3D or 2D."

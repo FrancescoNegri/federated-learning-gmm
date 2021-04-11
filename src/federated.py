@@ -57,8 +57,8 @@ if __name__ == '__main__':
         ax2 = fig.add_subplot(1, 2, 2)
         pca_components = 2
 
-    plot_PCA(ax1, train_dataset, train_dataset_labels, pca_components, args.soft_clustering, 'Dataset Clusters', random_seed=args.random_seed)
-    plot_PCA(ax2, train_dataset, predicted_labels, pca_components, args.soft_clustering, 'Predicted Clusters', random_seed=args.random_seed)
+    plot_PCA(ax1, train_dataset, train_dataset_labels, pca_components, args.soft, 'Dataset Clusters', random_seed=args.random_seed)
+    plot_PCA(ax2, train_dataset, predicted_labels, pca_components, args.soft, 'Predicted Clusters', random_seed=args.random_seed)
     fig.savefig(dir_name, dpi=300)
     plt.close(fig)
 
