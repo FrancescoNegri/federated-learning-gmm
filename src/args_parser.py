@@ -64,3 +64,6 @@ def parse_common(parser):
     parser.add_argument(
         '--plots_3d', type=int, default=0, help="Specifies if plots are to be done in 3D or 2D."
     )
+    parser.add_argument(
+        '--plots_step', type=int, default=1, help="Specifies the number of rounds or epochs after which saving a plot."
+    )

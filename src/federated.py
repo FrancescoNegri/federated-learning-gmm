@@ -37,7 +37,7 @@ if __name__ == '__main__':
         server.start_round(round)
         server.average_clients_models()
         server.update_server_model()
-        if (round+1) % 1 == 0: server.plot(train_dataset, train_dataset_labels, round)
+        if (round+1) % args.plots_step == 0: server.plot(train_dataset, train_dataset_labels, round)
 
     predicted_labels = server.predict(train_dataset)
 
