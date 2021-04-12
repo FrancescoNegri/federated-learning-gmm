@@ -10,6 +10,7 @@ The Gaussian Mixture Model is employed in unsupervised learning problems, especi
 |:----:|:-----------:|:-------:|:--------:|:---------:|
 | `--dataset` | Name of the dataset. | _iris_ | X | X |
 | `--components` | Number of Gaussians to fit. | _3_ | X | X |
+| `--init` | Model initialization method: random or kmeans. | _kmeans_ | X | X |
 | `--seed` | Number to have random consistent results across executions. | _None_| X | X |
 | `--samples` | Number of samples to generate. | _10000_ | X | X |
 | `--features` | Number of features for each generated sample. | _2_ | X | X |

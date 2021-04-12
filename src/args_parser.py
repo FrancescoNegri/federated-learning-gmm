@@ -46,6 +46,9 @@ def parse_common(parser):
     parser.add_argument(
         '--seed', default=None, help="Number to have random consistent results across executions."
     )
+    parser.add_argument(
+        '--init', type=str, default='kmeans', help="Model initialization method: random or kmeans."
+    )
     # parser.add_argument(
     #     '--path', default=None, help="Path of the custom dataset to use."
     # )

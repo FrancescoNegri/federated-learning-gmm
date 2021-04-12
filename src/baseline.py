@@ -29,7 +29,7 @@ if __name__ == '__main__':
         X=train_dataset,
         n_components=args.components,
         random_state=seed,
-        init_params='random'
+        init_params=args.init
     )
 
     model.fit(train_dataset, epochs=args.epochs)

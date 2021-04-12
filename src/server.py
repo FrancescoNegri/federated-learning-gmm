@@ -15,7 +15,7 @@ class Server():
             n_components=args.components,
             random_state=self.random_state,
             is_quiet=True,
-            init_params='random'
+            init_params=args.init
         )
 
         self.init_dataset = init_dataset
@@ -91,7 +91,7 @@ class Server():
             weights_init=self.avg_clients_weights,
             means_init=self.avg_clients_means,
             precisions_init=self.avg_clients_precisions,
-            init_params='random'
+            init_params=self.args.init
         )
 
     def plot(self, X, labels, round=None):
