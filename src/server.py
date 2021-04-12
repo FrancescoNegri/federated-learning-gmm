@@ -1,10 +1,8 @@
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 from gmm import GaussianMixture
-from utils import plot_PCA
 
 class Server():
     def __init__(self, args, init_dataset, clients, output_dir):
@@ -95,34 +93,6 @@ class Server():
         )
 
     def plot(self, X, labels, round=None):
-        path = './model'
-        dir_name = os.path.join(self.output_dir, path)
-        os.makedirs(dir_name, exist_ok=True)
-
-        if round is None: filename = 'init'
-        else: filename = 'round_{}'.format(round+1)
-        dir_name = os.path.join(dir_name, filename)
-
-        fig = plt.figure(figsize=plt.figaspect(0.5))
-        if X.shape[1] <= 2: self.args.plots_3d = 0
-        if bool(self.args.plots_3d) == True:
-            ax1 = fig.add_subplot(1, 2, 1, projection='3d')
-            ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-            pca_components = 3
-        else:
-            ax1 = fig.add_subplot(1, 2, 1)
-            ax2 = fig.add_subplot(1, 2, 2)
-            pca_components = 2
-
-        plot_PCA(ax1, X, labels, pca_components, self.args.soft, 'Dataset Clusters', random_state=self.random_state)
-        plot_PCA(ax2, X, self.predict(X), pca_components, self.args.soft, 'Predicted Clusters', random_state=self.random_state)
-        fig.savefig(dir_name, dpi=150)
-        plt.close(fig)
-
-
-    def predict(self, X):
-        predicted_labels = self.model.predict_proba(X).tolist()
-        predicted_labels = np.array(predicted_labels)
-
-        return predicted_labels
+        self.model.plot(X, labels, self.args, self.output_dir, 'round', round)
+        return
 

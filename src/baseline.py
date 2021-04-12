@@ -5,7 +5,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils import get_dataset, plot_PCA, prepare_output_dir
+from utils import get_dataset, plot_PCA, prepare_output_dir, print_configuration
 from args_parser import parse_args
 
 from gmm import GaussianMixture
@@ -32,7 +32,7 @@ if __name__ == '__main__':
         init_params=args.init
     )
 
-    model.fit(train_dataset, epochs=args.epochs)
+    model.fit(train_dataset, args.epochs, train_dataset_labels, args, output_dir)
 
     predicted_labels = model.predict_proba(train_dataset).tolist()
     predicted_labels = np.array(predicted_labels)

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 from client import Client
 from server import Server
-from utils import get_dataset, plot_PCA, prepare_output_dir
+from utils import get_dataset, plot_PCA, prepare_output_dir, print_configuration
 from args_parser import parse_args
 
 if __name__ == '__main__':    

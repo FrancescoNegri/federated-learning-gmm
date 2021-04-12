@@ -1,11 +1,15 @@
+import os
 import sklearn.mixture
 import numpy as np
+import matplotlib.pyplot as plt
 import torch
 from tqdm import tqdm
 from scipy import linalg
 
 import warnings
 from sklearn.exceptions import ConvergenceWarning
+
+from utils import plot_PCA
 warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
 
@@ -69,7 +73,7 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
         # precisions_ is computed as before
         self._set_parameters(self._get_parameters())
 
-    def fit(self, X, epochs=1):
+    def fit(self, X, epochs=1, labels=None, args=None, output_dir=None):
 
         if torch.is_tensor(X):
             X = np.array(X.tolist())
@@ -85,7 +89,7 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
             'weights': []
         }
 
-        #is_not_converged = (not hasattr(self, 'converged_')) or (self.converged_ is False)
+        if not self._is_quiet: self.plot(X, labels, args, output_dir)
 
         pbar = tqdm(range(epochs), disable=self._is_quiet)
         for epoch in pbar:
@@ -98,6 +102,7 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
             self.history_['means'].append(self.means_)
             self.history_['weights'].append(self.weights_)
             self.history_['covariances'].append(self.covariances_)
+            if not self._is_quiet: self.plot(X, labels, args, output_dir, 'epoch', epoch)
 
         if not self._is_quiet:
             if self.converged_:
@@ -107,12 +112,43 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
 
         return self.history_
 
+    def predict(self, X):
+        predicted_labels = self.predict_proba(X).tolist()
+        predicted_labels = np.array(predicted_labels)
+
+        return predicted_labels
+    
     def get_parameters(self):
         parameters = self._get_parameters()
         return parameters
 
     def set_parameters(self, params):
         self._set_parameters(params)
+
+    def plot(self, X, labels, args, output_dir, filename=None, iteration=None):
+        path = './model'
+        dir_name = os.path.join(output_dir, path)
+        os.makedirs(dir_name, exist_ok=True)
+
+        if iteration is None: filename = 'init'
+        else: filename = '{}_{}'.format(filename, iteration+1)
+        dir_name = os.path.join(dir_name, filename)
+
+        fig = plt.figure(figsize=plt.figaspect(0.5))
+        if X.shape[1] <= 2: args.plots_3d = 0
+        if bool(args.plots_3d) == True:
+            ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+            ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+            pca_components = 3
+        else:
+            ax1 = fig.add_subplot(1, 2, 1)
+            ax2 = fig.add_subplot(1, 2, 2)
+            pca_components = 2
+
+        plot_PCA(ax1, X, labels, pca_components, args.soft, 'Dataset Clusters', random_state=self.random_state)
+        plot_PCA(ax2, X, self.predict(X), pca_components, args.soft, 'Predicted Clusters', random_state=self.random_state)
+        fig.savefig(dir_name, dpi=150)
+        plt.close(fig)
 
     def compute_precision_cholesky(self, covariances, covariance_type):
         """Compute the Cholesky decomposition of the precisions.
