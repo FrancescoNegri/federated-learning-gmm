@@ -18,9 +18,7 @@ if __name__ == '__main__':
 
     train_dataset, train_dataset_labels, _ = get_dataset(args)
 
-    print('\n')
-    print('Configuration:')
-    print('\n')
+    print_configuration(args, train_dataset, False)
 
     # Init the Gaussian Mixture Model
     seed = None

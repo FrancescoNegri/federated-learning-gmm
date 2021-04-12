@@ -18,9 +18,7 @@ if __name__ == '__main__':
 
     train_dataset, train_dataset_labels, clients_groups = get_dataset(args)
 
-    print('\n')
-    print('Configuration:')
-    print('\n')
+    print_configuration(args, train_dataset, True)
 
     # Prepare clients
     clients = {}

@@ -219,6 +219,42 @@ def exp_details(args):
     print(f'    Local Epochs       : {args.local_ep}\n')
     return
 
+def print_configuration(args, dataset, is_federated):
+    print('\nCONFIGURATION')
+    print('--------------------------------------------------')
+
+    if is_federated: print(f'Mode: FEDERATED')
+    else: print(f'Mode: BASELINE')
+    
+    # Common
+    print(f'Clusters: {args.components}')
+    print(f'\tSoft Clustering: {bool(args.soft)}')
+    print(f'Dataset: {args.dataset}')
+    print(f'\tFeatures: {dataset.shape[1]}')
+    print(f'\tInstances: {dataset.shape[0]}')
+    if is_federated: print(f'\tPartition: IID')
+    print(f'Initialization: {args.init}')
+    if bool(args.plots_3d): print(f'Plots: 3D')
+    else: print(f'Plots: 2D')
+    print(f'\tPlotting Step: {args.plots_step}')
+
+    if is_federated:
+        # Federated
+        print(f'Rounds: {args.rounds}')
+        print(f'\tLocal Epochs: 1')
+        print(f'Clients: {args.K}')
+        print(f'\tClients fraction: {args.C * 100}%')
+        print(f'\tClients per round: {int(args.K * args.C)}')
+        print(f'\tData instances per client: {int(dataset.shape[0] / args.K)}')
+    else:
+        # Baseline
+        print(f'Epochs: {args.epochs}')
+
+    print('--------------------------------------------------')
+    print('\n')
+
+    return
+
 def plot_PCA(ax, X, labels, pca_components=2, soft_clustering=True, title=None, random_state=None):  
     if X.shape[1] > 1:  
         if pca_components > 2: pca_components = 3
