@@ -37,7 +37,7 @@ if __name__ == '__main__':
         server.update_server_model()
         if (round+1) % args.plots_step == 0: server.plot(train_dataset, train_dataset_labels, round)
 
-    predicted_labels = server.predict(train_dataset)
+    predicted_labels = server.model.predict(train_dataset)
 
     print('\nSaving images...')
     
