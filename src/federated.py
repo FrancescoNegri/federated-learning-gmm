@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 
 from client import Client
 from server import Server
-from utils import get_dataset, plot_PCA, prepare_output_dir, print_configuration
+from utils import get_dataset, plot_PCA, prepare_output_dir
+from utils import print_configuration, save_configuration
 from args_parser import parse_args
 
 if __name__ == '__main__':    
@@ -19,6 +20,7 @@ if __name__ == '__main__':
     train_dataset, train_dataset_labels, clients_groups = get_dataset(args)
 
     print_configuration(args, train_dataset, True)
+    save_configuration(args, train_dataset, output_dir, True)
 
     # Prepare clients
     clients = {}

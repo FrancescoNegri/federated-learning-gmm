@@ -1,6 +1,7 @@
 import os
 import copy
 import matplotlib.pyplot as plt
+from scipy.sparse import data
 import torch
 from datetime import datetime
 from tqdm import tqdm
@@ -12,6 +13,7 @@ from sklearn.decomposition import PCA
 import numpy as np
 import pandas as pd
 import colorsys
+import json
 
 # for loading/processing the images
 from keras.preprocessing.image import load_img
@@ -189,42 +191,11 @@ def get_dataset(args):
 
     return train_dataset, train_dataset_labels, user_groups
 
-
-def average_weights(w):
-    """
-    Returns the average of the weights.
-    """
-    w_avg = copy.deepcopy(w[0])
-    for key in w_avg.keys():
-        for i in range(1, len(w)):
-            w_avg[key] += w[i][key]
-        w_avg[key] = torch.div(w_avg[key], len(w))
-    return w_avg
-
-
-def exp_details(args):
-    print('\nExperimental details:')
-    print(f'    Model     : {args.model}')
-    print(f'    Optimizer : {args.optimizer}')
-    print(f'    Learning  : {args.lr}')
-    print(f'    Global Rounds   : {args.epochs}\n')
-
-    print('    Federated parameters:')
-    if args.iid:
-        print('    IID')
-    else:
-        print('    Non-IID')
-    print(f'    Fraction of users  : {args.frac}')
-    print(f'    Local Batch size   : {args.local_bs}')
-    print(f'    Local Epochs       : {args.local_ep}\n')
-    return
-
 def print_configuration(args, dataset, is_federated):
     print('\nCONFIGURATION')
     print('--------------------------------------------------')
 
-    if is_federated: print(f'Mode: FEDERATED')
-    else: print(f'Mode: BASELINE')
+    print(f'Mode: FEDERATED') if is_federated else print(f'Mode: BASELINE')
     
     # Common
     print(f'Clusters: {args.components}')
@@ -232,10 +203,9 @@ def print_configuration(args, dataset, is_federated):
     print(f'Dataset: {args.dataset}')
     print(f'\tFeatures: {dataset.shape[1]}')
     print(f'\tInstances: {dataset.shape[0]}')
-    if is_federated: print(f'\tPartition: IID')
+    print(f'\tPartition: IID') if is_federated else print(f'\tPartition: NULL')
     print(f'Initialization: {args.init}')
-    if bool(args.plots_3d): print(f'Plots: 3D')
-    else: print(f'Plots: 2D')
+    print(f'Plots: 3D') if bool(args.plots_3d) else print(f'Plots: 2D')
     print(f'\tPlotting Step: {args.plots_step}')
 
     if is_federated:
@@ -252,6 +222,49 @@ def print_configuration(args, dataset, is_federated):
 
     print('--------------------------------------------------')
     print('\n')
+
+    return
+
+def save_configuration(args, dataset, output_dir, is_federated):
+    
+    output_dir = str(output_dir).split('\\')[-1]
+
+    configuration = {
+        'execution_time': output_dir,
+        'mode': 'FEDERATED' if is_federated else 'BASELINE',
+        'clusters': args.components,
+        'soft_clustering': bool(args.soft),
+        'dataset': {
+            'name': args.dataset,
+            'features': dataset.shape[1],
+            'instances': dataset.shape[0],
+            'partition': 'IID' if is_federated else 'null',
+        },
+        'initialization': args.init,
+        'plots': {
+            'type': '3D' if args.plots_3d else '2D',
+            'step_size': args.plots_step
+        }
+    }
+
+    if is_federated:
+        # Federated
+        configuration['dataset']['data_instances_per_client'] = int(dataset.shape[0] / args.K)
+        configuration['rounds'] = args.rounds
+        configuration['local_epochs'] = 1
+        configuration['clients'] = {
+            'total': args.K,
+            'round_fraction_perc': str(args.C * 100) + '%',
+            'round_fraction_num': int(args.K * args.C), 
+        }
+    else:
+        # Baseline
+        configuration['epochs'] = args.epochs
+
+    filename = 'config.json'
+    path =   r'output/' + output_dir + '/' + filename
+    with open(path, 'w') as f:
+        json.dump(configuration, f)
 
     return
 
@@ -367,7 +380,6 @@ def show_img_clusters(args, labels, n_samples=None):
         filename = 'cluster_{}.png'.format(cluster)
         dir_name = os.path.join(dir, path, filename)
         plt.savefig(dir_name, dpi=100)
-
 
 def extract_img_features(args, files, n_features=None):
     model = VGG16()
