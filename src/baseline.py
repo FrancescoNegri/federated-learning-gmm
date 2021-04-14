@@ -4,7 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import random
 import numpy as np
 
-from utils import get_dataset, prepare_output_dir
+from utils import get_dataset, plot_metric, prepare_output_dir
 from utils import print_configuration, save_configuration
 from args_parser import parse_args
 
@@ -40,33 +40,11 @@ if __name__ == '__main__':
 
     print('\nSaving images...')
 
-    # filename = 'temp.png'
-    # dir_name = os.path.join(dir, path, filename)
-    # plt.figure()
-    # mydata = model.history_['ll']
-    # plt.plot(range(1, len(mydata)+1), mydata)
-    # plt.xlabel('Epochs')
-    # plt.ylabel('Log-Likelihood')
-    # plt.savefig(dir_name)
-
-    # # Final plot
-    # filename = 'results.png'
-    # dir_name = os.path.join(output_dir, filename)
-    # fig = plt.figure(figsize=plt.figaspect(0.5))
-    # if train_dataset.shape[1] <= 2: args.plots_3d = 0
-    # if bool(args.plots_3d) == True:
-    #     ax1 = fig.add_subplot(1, 2, 1, projection='3d')
-    #     ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-    #     pca_components = 3
-    # else:
-    #     ax1 = fig.add_subplot(1, 2, 1)
-    #     ax2 = fig.add_subplot(1, 2, 2)
-    #     pca_components = 2
-
-    # plot_PCA(ax1, train_dataset, train_dataset_labels, pca_components, args.soft, 'Dataset Clusters', random_state=args.seed)
-    # plot_PCA(ax2, train_dataset, predicted_labels, pca_components, args.soft, 'Predicted Clusters', random_state=args.seed)
-    # fig.savefig(dir_name, dpi=300)
-    # plt.close(fig)
+    metrics = model.history_['metrics']
+    
+    plot_metric(metrics['ll'], args.epochs, output_dir, 'Epochs', 'Log-Likelihood')
+    plot_metric(metrics['aic'], args.epochs, output_dir, 'Epochs', 'AIC')
+    plot_metric(metrics['bic'], args.epochs, output_dir, 'Epochs', 'BIC')
 
     print('Done.')
 

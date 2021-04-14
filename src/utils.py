@@ -1,7 +1,5 @@
 import os
-import copy
 import matplotlib.pyplot as plt
-from scipy.sparse import data
 import torch
 from datetime import datetime
 from tqdm import tqdm
@@ -319,6 +317,25 @@ def plot_PCA(ax, X, labels, pca_components=2, soft_clustering=True, title=None, 
             ax.set_title(title)
     else:
         print('Data have only 1 feature. PCA cannot be applied.')
+
+    return
+
+def plot_metric(metric, n_iterations, output_dir, xLabel, yLabel):
+    filename = str(yLabel).lower().replace('-', '_') + '.png'
+    dir_name = os.path.join(output_dir, filename)
+
+    ax = plt.figure().gca()
+    x = np.arange(start=1, stop=n_iterations+1)
+    y = metric
+    ax.xaxis.get_major_locator().set_params(integer=True)
+    ax.plot(x, y)
+    
+    plt.xlabel(xLabel)
+    plt.ylabel(yLabel)
+    plt.title(yLabel + ' vs. ' + xLabel)
+
+    plt.savefig(dir_name, dpi=150)
+    plt.close()
 
     return
 
