@@ -333,6 +333,7 @@ def plot_metric(metric, n_iterations, output_dir, xLabel, yLabel):
     plt.xlabel(xLabel)
     plt.ylabel(yLabel)
     plt.title(yLabel + ' vs. ' + xLabel)
+    plt.tight_layout()
 
     plt.savefig(dir_name, dpi=150)
     plt.close()
