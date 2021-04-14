@@ -202,6 +202,7 @@ def print_configuration(args, dataset, is_federated):
     print(f'\tInstances: {dataset.shape[0]}')
     print(f'\tPartition: IID') if is_federated else print(f'\tPartition: NULL')
     print(f'Initialization: {args.init}')
+    print(f'Random Seed: {args.seed}')
     print(f'Plots: 3D') if bool(args.plots_3d) else print(f'Plots: 2D')
     print(f'\tPlotting Step: {args.plots_step}')
 
@@ -237,6 +238,7 @@ def save_configuration(args, dataset, output_dir, is_federated):
             'partition': 'IID' if is_federated else 'null',
         },
         'initialization': args.init,
+        'random_seed': args.seed,
         'plots': {
             'type': '3D' if args.plots_3d else '2D',
             'step_size': args.plots_step
