@@ -33,6 +33,7 @@ class Server():
             selected_clients.append(self.clients[idx])
 
         self.selected_clients[round] = selected_clients
+        
         return selected_clients
 
     def _set_parameters_from_clients_models(self, round_history):
@@ -40,15 +41,18 @@ class Server():
         self.clients_covariances = []
         self.clients_weights = []
         
-        for idx in round_history:
-            history = round_history[idx]
-            self.clients_means.append(history['means'])
-            self.clients_covariances.append(history['covariances'])
-            self.clients_weights.append(history['weights'])
+        for client_id in round_history:
+            parameters = round_history[client_id]['parameters']
+
+            self.clients_means.append(parameters['means'])
+            self.clients_covariances.append(parameters['covariances'])
+            self.clients_weights.append(parameters['weights'])
 
         self.clients_means = np.array(self.clients_means)
         self.clients_covariances = np.array(self.clients_covariances)
         self.clients_weights = np.array(self.clients_weights)
+
+        return
     
     def start_round(self, round):
         selected_clients = self._select_round_clients(round)
@@ -65,12 +69,14 @@ class Server():
         
         self._set_parameters_from_clients_models(round_history)
 
+        return
+
     def average_clients_models(self):
         gamma = 1 / self.n_clients_round # weight for each client (the same)
         
-        [self.avg_clients_means] = np.sum(self.clients_means * gamma, axis=0)
+        [self.avg_clients_means] = np.sum(self.clients_means * pow(gamma, 1), axis=0)
         [self.avg_clients_covariances] = np.sum(self.clients_covariances * pow(gamma, 2), axis=0)
-        [self.avg_clients_weights] = np.sum(self.clients_weights * gamma, axis=0)
+        [self.avg_clients_weights] = np.sum(self.clients_weights * pow(gamma, 1), axis=0)
         
         self.avg_clients_precisions_cholesky = self.model.compute_precision_cholesky(self.avg_clients_covariances, self.model.covariance_type)
         
@@ -79,6 +85,8 @@ class Server():
 
         self.avg_clients_precisions = self.model.precisions_
 
+        return
+
     def update_server_model(self):
         # The model must be regenerated with the new average parameters. It cannot simply be updated (it might be initialized again with wrong parameters)
         self.model =  GaussianMixture(
@@ -86,13 +94,16 @@ class Server():
             n_components=self.args.components,
             random_state=self.random_state,
             is_quiet=True,
+            init_params=self.args.init,
             weights_init=self.avg_clients_weights,
             means_init=self.avg_clients_means,
-            precisions_init=self.avg_clients_precisions,
-            init_params=self.args.init
+            precisions_init=self.avg_clients_precisions
         )
+
+        return
 
     def plot(self, X, labels, round=None):
         self.model.plot(X, labels, self.args, self.output_dir, 'round', round)
+        
         return
 

@@ -80,13 +80,17 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
 
         self.history_ = {
             'epochs': epochs,
-            'aic': [],
-            'bic': [],
-            'll': [],
             'converged': [],
-            'means': [],
-            'covariances': [],
-            'weights': []
+            'metrics': {
+                'aic': [],
+                'bic': [],
+                'll': [],
+            },
+            'parameters': {
+                'means': [],
+                'covariances': [],
+                'weights': []
+            } 
         }
 
         if not self._is_quiet: self.plot(X, labels, args, output_dir)
@@ -94,15 +98,21 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
         pbar = tqdm(range(epochs), disable=self._is_quiet)
         for epoch in pbar:
             pbar.set_description('Epoch {}/{}'.format(epoch+1, epochs))
+            
             super().fit(X)
-            self.history_['aic'].append(self.aic(X))
-            self.history_['bic'].append(self.bic(X))
-            self.history_['ll'].append(self.lower_bound_)
+
             self.history_['converged'].append(self.converged_)
-            self.history_['means'].append(self.means_)
-            self.history_['weights'].append(self.weights_)
-            self.history_['covariances'].append(self.covariances_)
-            if not self._is_quiet: self.plot(X, labels, args, output_dir, 'epoch', epoch)
+
+            self.history_['metrics']['aic'].append(self.aic(X))
+            self.history_['metrics']['bic'].append(self.bic(X))
+            self.history_['metrics']['ll'].append(self.lower_bound_)
+            
+            self.history_['parameters']['means'].append(self.means_)
+            self.history_['parameters']['weights'].append(self.weights_)
+            self.history_['parameters']['covariances'].append(self.covariances_)
+
+            if not self._is_quiet and (epoch+1) % args.plots_step == 0: 
+                self.plot(X, labels, args, output_dir, 'epoch', epoch)
 
         if not self._is_quiet:
             if self.converged_:
@@ -120,10 +130,13 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
     
     def get_parameters(self):
         parameters = self._get_parameters()
+
         return parameters
 
     def set_parameters(self, params):
         self._set_parameters(params)
+
+        return
 
     def plot(self, X, labels, args, output_dir, filename=None, iteration=None):
         path = './model'
@@ -149,6 +162,8 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
         plot_PCA(ax2, X, self.predict(X), pca_components, args.soft, 'Predicted Clusters', random_state=self.random_state)
         fig.savefig(dir_name, dpi=150)
         plt.close(fig)
+
+        return
 
     def compute_precision_cholesky(self, covariances, covariance_type):
         """Compute the Cholesky decomposition of the precisions.
