@@ -15,20 +15,9 @@ warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
 class GaussianMixture(sklearn.mixture.GaussianMixture):
 
-    def __init__(
-        self,
-        X,
-        n_components=3,
-        covariance_type='full',
-        weights_init=None,
-        means_init=None,
-        precisions_init=None,
-        covariances_init=None,
-        init_params='kmeans',
-        tol=1e-3,
-        random_state=None,
-        is_quiet=False
-    ):
+    def __init__(self, X, n_components=3, covariance_type='full',
+                 weights_init=None, means_init=None, precisions_init=None, covariances_init=None,
+                 init_params='kmeans', tol=1e-3, random_state=None, is_quiet=False):
 
         if torch.is_tensor(X):
             X = np.array(X.tolist())
@@ -47,11 +36,11 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
             _init_model._initialize_parameters(X, np.random.RandomState(random_state))
             # The gaussian parameters are fed into _set_parameters() which computes also precisions_ (the others remain the same)
             _init_model._set_parameters(_init_model._get_parameters())
-            
-            weights_init=_init_model.weights_
-            means_init=_init_model.means_
-            precisions_init=_init_model.precisions_
-            covariances_init=_init_model.covariances_
+
+            weights_init = _init_model.weights_
+            means_init = _init_model.means_
+            precisions_init = _init_model.precisions_
+            covariances_init = _init_model.covariances_
 
         super().__init__(
             n_components=n_components,
@@ -90,15 +79,16 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
                 'means': [],
                 'covariances': [],
                 'weights': []
-            } 
+            }
         }
 
-        if not self._is_quiet: self.plot(X, labels, args, output_dir)
+        if not self._is_quiet:
+            self.plot(X, labels, args, output_dir)
 
         pbar = tqdm(range(epochs), disable=self._is_quiet)
         for epoch in pbar:
             pbar.set_description('Epoch {}/{}'.format(epoch+1, epochs))
-            
+
             super().fit(X)
 
             self.history_['converged'].append(self.converged_)
@@ -106,12 +96,12 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
             self.history_['metrics']['aic'].append(self.aic(X))
             self.history_['metrics']['bic'].append(self.bic(X))
             self.history_['metrics']['ll'].append(self.score(X))
-            
+
             self.history_['parameters']['means'].append(self.means_)
             self.history_['parameters']['weights'].append(self.weights_)
             self.history_['parameters']['covariances'].append(self.covariances_)
 
-            if not self._is_quiet and (epoch+1) % args.plots_step == 0: 
+            if not self._is_quiet and (epoch+1) % args.plots_step == 0:
                 self.plot(X, labels, args, output_dir, 'epoch', epoch)
 
         if not self._is_quiet:
@@ -127,7 +117,7 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
         predicted_labels = np.array(predicted_labels)
 
         return predicted_labels
-    
+
     def get_parameters(self):
         parameters = self._get_parameters()
 
@@ -143,12 +133,14 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
         dir_name = os.path.join(output_dir, path)
         os.makedirs(dir_name, exist_ok=True)
 
-        if iteration is None: filename = 'init'
-        else: filename = '{}_{}'.format(filename, iteration+1)
+        filename = 'init' if iteration is None else filename = '{}_{}'.format(filename, iteration+1)
         dir_name = os.path.join(dir_name, filename)
 
         fig = plt.figure(figsize=plt.figaspect(0.5))
-        if X.shape[1] <= 2: args.plots_3d = 0
+        
+        if X.shape[1] <= 2:
+            args.plots_3d = 0
+
         if bool(args.plots_3d) == True:
             ax1 = fig.add_subplot(1, 2, 1, projection='3d')
             ax2 = fig.add_subplot(1, 2, 2, projection='3d')
@@ -195,8 +187,9 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
                 except linalg.LinAlgError:
                     raise ValueError(estimate_precision_error_message)
                 precisions_chol[k] = linalg.solve_triangular(cov_chol,
-                                                            np.eye(n_features),
-                                                            lower=True).T
+                                                             np.eye(
+                                                                 n_features),
+                                                             lower=True).T
         elif covariance_type == 'tied':
             _, n_features = covariances.shape
             try:
@@ -204,7 +197,7 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
             except linalg.LinAlgError:
                 raise ValueError(estimate_precision_error_message)
             precisions_chol = linalg.solve_triangular(cov_chol, np.eye(n_features),
-                                                    lower=True).T
+                                                      lower=True).T
         else:
             if np.any(np.less_equal(covariances, 0.0)):
                 raise ValueError(estimate_precision_error_message)

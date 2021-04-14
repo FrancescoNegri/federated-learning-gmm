@@ -1,6 +1,5 @@
 import argparse
 
-
 def parse_args(is_federated):
     parser = argparse.ArgumentParser()
     parse_common(parser)
@@ -13,17 +12,15 @@ def parse_args(is_federated):
         print('Unspecified mode: federated or baseline?')
 
     args = parser.parse_args()
+    
     return args
 
 def parse_baseline(parser):
     parser.add_argument(
         '--epochs', type=int, default=100, help="Number of epochs of training."
     )
-    # parser.add_argument(
-    #     '--batch_size', default=None, help="Number of items for each batch. If unspecified no batch is used."
-    # )
-
-
+    
+    return
 
 def parse_federated(parser):
     parser.add_argument(
@@ -35,6 +32,8 @@ def parse_federated(parser):
     parser.add_argument(
         '--C', type=float, default=0.1, help='Fraction of clients to employ in each round. From 0 to 1.'
     )
+
+    return
 
 def parse_common(parser):
     parser.add_argument(
@@ -49,9 +48,6 @@ def parse_common(parser):
     parser.add_argument(
         '--init', type=str, default='kmeans', help="Model initialization method: random or kmeans."
     )
-    # parser.add_argument(
-    #     '--path', default=None, help="Path of the custom dataset to use."
-    # )
     parser.add_argument(
         '--samples', type=int, default=10000, help="Number of samples to generate."
     )
@@ -67,3 +63,5 @@ def parse_common(parser):
     parser.add_argument(
         '--plots_step', type=int, default=1, help="Specifies the number of rounds or epochs after which saving a plot."
     )
+
+    return
