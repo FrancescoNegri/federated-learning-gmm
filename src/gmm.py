@@ -105,7 +105,7 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
 
             self.history_['metrics']['aic'].append(self.aic(X))
             self.history_['metrics']['bic'].append(self.bic(X))
-            self.history_['metrics']['ll'].append(self.lower_bound_)
+            self.history_['metrics']['ll'].append(self.score(X))
             
             self.history_['parameters']['means'].append(self.means_)
             self.history_['parameters']['weights'].append(self.weights_)
