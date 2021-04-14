@@ -6,15 +6,15 @@
 import numpy as np
 from torchvision import datasets, transforms
 
-def sample_iid(dataset, num_users):
-    num_items = int(len(dataset) / num_users)
-    dict_users, all_idxs = {}, [i for i in range(len(dataset))]
+def sample_iid(dataset, n_clients):
+    num_items = int(len(dataset) / n_clients)
+    clients_groups, all_idxs = {}, [i for i in range(len(dataset))]
     
-    for i in range(num_users):
-        dict_users[i] = set(np.random.choice(all_idxs, num_items, replace=False))
-        all_idxs = list(set(all_idxs) - dict_users[i])
+    for i in range(n_clients):
+        clients_groups[i] = set(np.random.choice(all_idxs, num_items, replace=False))
+        all_idxs = list(set(all_idxs) - clients_groups[i])
 
-    return dict_users
+    return clients_groups
 
 # def mnist_iid(dataset, num_users):
 #     """

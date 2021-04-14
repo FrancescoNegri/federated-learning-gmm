@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 import torch
 from datetime import datetime
 from tqdm import tqdm
-from sampling import mnist_iid, mnist_noniid, mnist_noniid_unequal
-from sampling import cifar_iid, cifar_noniid
 from sampling import sample_iid
 from sklearn import datasets, preprocessing
 from sklearn.decomposition import PCA
@@ -40,18 +38,20 @@ def get_dataset(args):
         data = scaler.transform(data)
         train_dataset = torch.Tensor(data)
 
-        user_groups = None
+        clients_groups = None
 
     elif args.dataset == 'blob':
         seed = None
         if args.seed:
             seed = int(args.seed)
+
         data, labels = datasets.make_blobs(
             n_samples=args.samples,
             n_features=args.features,
             centers=args.components,
             random_state=seed
         )
+
         scaler = preprocessing.StandardScaler()
         scaler.fit(data)
         data = scaler.transform(data)
@@ -61,68 +61,67 @@ def get_dataset(args):
         lb.fit(labels)
         labels = lb.transform(labels)
         train_dataset_labels = labels
+        
+        clients_groups = None
+        if hasattr(args, 'K'): clients_groups = sample_iid(train_dataset, args.K)
 
-        #IID
-        user_groups = None
-        if hasattr(args, 'K'): user_groups = sample_iid(train_dataset, args.K)
+    # elif args.dataset == 'custom':
+    #     if args.path:
+    #         dataset_name = os.path.basename(os.path.normpath(args.path))
+    #         n_features = 210
+    #         if n_features is None:
+    #             features_filename = '{}_features_{}.pt'.format(dataset_name, 'full')
+    #         else:
+    #             features_filename = '{}_features_{}.pt'.format(dataset_name, 'pca' + str(n_features))
+    #         filename = features_filename
+    #         dir_name = os.path.join(dir, args.path, filename)
 
-    elif args.dataset == 'custom':
-        if args.path:
-            dataset_name = os.path.basename(os.path.normpath(args.path))
-            n_features = 210
-            if n_features is None:
-                features_filename = '{}_features_{}.pt'.format(dataset_name, 'full')
-            else:
-                features_filename = '{}_features_{}.pt'.format(dataset_name, 'pca' + str(n_features))
-            filename = features_filename
-            dir_name = os.path.join(dir, args.path, filename)
+    #         loaded_dataset = None
+    #         try:
+    #             loaded_dataset = torch.load(dir_name)
+    #             print("Features loaded.")
+    #         except:
+    #             print("Features not found.")
 
-            loaded_dataset = None
-            try:
-                loaded_dataset = torch.load(dir_name)
-                print("Features loaded.")
-            except:
-                print("Features not found.")
+    #         if loaded_dataset is None:
+    #             dir_img = 'images'
+    #             dir_name = os.path.join(dir, args.path, dir_img)
 
-            if loaded_dataset is None:
-                dir_img = 'images'
-                dir_name = os.path.join(dir, args.path, dir_img)
+    #             items = []
 
-                items = []
+    #             with os.scandir(dir_name) as files:
+    #                 # loops through each file in the directory
+    #                 img_formats = ('.png', '.jpg', 'jpeg')
+    #                 for file in files:
+    #                     if file.name.endswith(img_formats):
+    #                         item = os.path.join(dir_name, file.name)
+    #                         items.append(item)
 
-                with os.scandir(dir_name) as files:
-                    # loops through each file in the directory
-                    img_formats = ('.png', '.jpg', 'jpeg')
-                    for file in files:
-                        if file.name.endswith(img_formats):
-                            item = os.path.join(dir_name, file.name)
-                            items.append(item)
+    #             data = extract_img_features(args, items, n_features)
+    #             train_dataset = torch.Tensor(data)
 
-                data = extract_img_features(args, items, n_features)
-                train_dataset = torch.Tensor(data)
+    #             filename = features_filename
+    #             dir_name = os.path.join(dir, args.path, filename)
+    #             torch.save(train_dataset, dir_name)
+    #         else:
+    #             train_dataset = loaded_dataset
 
-                filename = features_filename
-                dir_name = os.path.join(dir, args.path, filename)
-                torch.save(train_dataset, dir_name)
-            else:
-                train_dataset = loaded_dataset
+    #         try:
+    #             filename = 'labels.csv'
+    #             dir_name = os.path.join(dir, args.path, filename)
+    #             train_dataset_labels = pd.read_csv(dir_name)
+    #             train_dataset_labels = train_dataset_labels['label'].to_numpy()
+    #         except:
+    #             print('Labels not found.')
+    #             train_dataset_labels = None
 
-            try:
-                filename = 'labels.csv'
-                dir_name = os.path.join(dir, args.path, filename)
-                train_dataset_labels = pd.read_csv(dir_name)
-                train_dataset_labels = train_dataset_labels['label'].to_numpy()
-            except:
-                print('Labels not found.')
-                train_dataset_labels = None
+    #         user_groups = None
 
-            user_groups = None
-
-        else:
-            print('Error: dataset path not specified!')
-            train_dataset = None
-            train_dataset_labels = None
-            user_groups = None
+    #     else:
+    #         print('Error: dataset path not specified!')
+    #         train_dataset = None
+    #         train_dataset_labels = None
+    #         user_groups = None
 
     # if args.dataset == 'cifar':
     #     path = '../data/cifar'
@@ -187,7 +186,7 @@ def get_dataset(args):
     #             # Chose euqal splits for every user
     #             user_groups = mnist_noniid(train_dataset, args.num_users)
 
-    return train_dataset, train_dataset_labels, user_groups
+    return train_dataset, train_dataset_labels, clients_groups
 
 def print_configuration(args, dataset, is_federated):
     print('\nCONFIGURATION')
@@ -224,7 +223,6 @@ def print_configuration(args, dataset, is_federated):
     return
 
 def save_configuration(args, dataset, output_dir, is_federated):
-    
     output_dir = str(output_dir).split('\\')[-1]
 
     configuration = {
@@ -294,27 +292,15 @@ def plot_PCA(ax, X, labels, pca_components=2, soft_clustering=True, title=None, 
 
         if pca_components == 2:
             ax.set_aspect(1)
-            ax.scatter(
-                pc1,
-                pc2,
-                s=0.3,
-                c=colors
-            )
+            ax.scatter(pc1, pc2, s=0.3, c=colors)
         else:
-            ax.scatter(
-                pc1,
-                pc2,
-                pc3,
-                s=0.3,
-                c=colors
-            )
+            ax.scatter(pc1, pc2, pc3, s=0.3, c=colors)
 
         ax.set_xlabel('PC1')
         ax.set_ylabel('PC2')
         if pca_components == 3: ax.set_zlabel('PC3')
 
-        if title:
-            ax.set_title(title)
+        if title: ax.set_title(title)   
     else:
         print('Data have only 1 feature. PCA cannot be applied.')
 
@@ -402,6 +388,8 @@ def show_img_clusters(args, labels, n_samples=None):
         filename = 'cluster_{}.png'.format(cluster)
         dir_name = os.path.join(dir, path, filename)
         plt.savefig(dir_name, dpi=100)
+
+    return
 
 def extract_img_features(args, files, n_features=None):
     model = VGG16()
