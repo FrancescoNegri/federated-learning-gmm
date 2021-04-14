@@ -325,7 +325,11 @@ def plot_metric(metric, n_iterations, output_dir, xLabel, yLabel):
     dir_name = os.path.join(output_dir, filename)
 
     ax = plt.figure().gca()
-    x = np.arange(start=1, stop=n_iterations+1)
+
+    if n_iterations != len(metric):
+        x = np.arange(start=0, stop=n_iterations+1)
+    else:
+        x = np.arange(start=1, stop=n_iterations+1)
     y = metric
     ax.xaxis.get_major_locator().set_params(integer=True)
     ax.plot(x, y)

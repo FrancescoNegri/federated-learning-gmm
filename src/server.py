@@ -25,6 +25,11 @@ class Server():
         self.n_clients_round = int(self.fraction_clients * self.n_clients)
         self.selected_clients = {}
         self.output_dir = output_dir
+        self.metrics_history = {
+            'aic': [],
+            'bic': [],
+            'll': []
+        }
 
     def _select_round_clients(self, round):
         idxs_round_clients = np.random.choice(range(self.n_clients), self.n_clients_round, replace=False)
@@ -54,6 +59,24 @@ class Server():
 
         return
     
+    def _set_metrics_from_clients_models(self, round_history):
+        self.clients_aic = []
+        self.clients_bic = []
+        self.clients_ll = []
+
+        for client_id in round_history:
+            metrics = round_history[client_id]['metrics']
+
+            self.clients_aic.append(metrics['aic'])
+            self.clients_bic.append(metrics['bic'])
+            self.clients_ll.append(metrics['ll'])
+
+        self.clients_aic = np.array(self.clients_aic)
+        self.clients_bic = np.array(self.clients_bic)
+        self.clients_ll = np.array(self.clients_ll)
+
+        return
+
     def start_round(self, round):
         selected_clients = self._select_round_clients(round)
 
@@ -68,6 +91,7 @@ class Server():
                 pbar.set_description('Round: {}/{} | Completed'.format(round+1, self.rounds))
         
         self._set_parameters_from_clients_models(round_history)
+        self._set_metrics_from_clients_models(round_history)
 
         return
 
@@ -102,8 +126,21 @@ class Server():
 
         return
 
-    def plot(self, X, labels, round=None):
-        self.model.plot(X, labels, self.args, self.output_dir, 'round', round)
-        
+    def average_clients_metrics(self):
+        self.metrics_history['aic'].append(np.mean(self.clients_aic))
+        self.metrics_history['bic'].append(np.mean(self.clients_bic))
+        self.metrics_history['ll'].append(np.mean(self.clients_ll))
+
         return
 
+    def plot(self, X, labels, round=None):
+        self.model.plot(X, labels, self.args, self.output_dir, 'round', round)
+
+        return
+
+    def compute_init_metrics(self, X):
+        self.metrics_history['aic'].append(self.model.aic(X))
+        self.metrics_history['bic'].append(self.model.bic(X))
+        self.metrics_history['ll'].append(self.model.score(X))
+
+        return
