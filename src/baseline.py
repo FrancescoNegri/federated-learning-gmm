@@ -12,7 +12,9 @@ from gmm import GaussianMixture
 
 if __name__ == '__main__':    
     args = parse_args(is_federated=False)
-    if args.seed: random.seed(int(args.seed))
+    if args.seed: 
+        random.seed(int(args.seed))
+        np.random.RandomState(int(args.seed))
 
     output_dir = prepare_output_dir()
 

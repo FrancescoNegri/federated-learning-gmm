@@ -1,4 +1,5 @@
 import os
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import random
@@ -12,7 +13,9 @@ from args_parser import parse_args
 
 if __name__ == '__main__':    
     args = parse_args(is_federated=True)
-    if args.seed: random.seed(int(args.seed))
+    if args.seed: 
+        random.seed(int(args.seed))
+        np.random.RandomState(int(args.seed))
     
     output_dir = prepare_output_dir()   
 
@@ -26,7 +29,7 @@ if __name__ == '__main__':
     for idx_client in range(args.K):
         clients[idx_client] = Client(idx_client, train_dataset, clients_groups[idx_client])
 
-    # Prepare server
+    # Prepare server --> init_dataset is given by 0.5% of the train_dataset randomly sampled
     init_dataset_size = int(train_dataset.shape[0] * 0.005)
     init_dataset = train_dataset[np.random.choice(train_dataset.shape[0], init_dataset_size, replace=False)]
     server = Server(args, init_dataset, clients, output_dir)
