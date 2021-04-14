@@ -3,11 +3,10 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import random
 import numpy as np
-import matplotlib.pyplot as plt
 
 from client import Client
 from server import Server
-from utils import get_dataset, plot_PCA, prepare_output_dir
+from utils import get_dataset, prepare_output_dir
 from utils import print_configuration, save_configuration
 from args_parser import parse_args
 
@@ -43,23 +42,23 @@ if __name__ == '__main__':
 
     print('\nSaving images...')
     
-    # Final plot
-    filename = 'results.png'
-    dir_name = os.path.join(output_dir, filename)
-    fig = plt.figure(figsize=plt.figaspect(0.5))
-    if train_dataset.shape[1] <= 2: args.plots_3d = 0
-    if bool(args.plots_3d) == True:
-        ax1 = fig.add_subplot(1, 2, 1, projection='3d')
-        ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-        pca_components = 3
-    else:
-        ax1 = fig.add_subplot(1, 2, 1)
-        ax2 = fig.add_subplot(1, 2, 2)
-        pca_components = 2
+    # # Final plot
+    # filename = 'results.png'
+    # dir_name = os.path.join(output_dir, filename)
+    # fig = plt.figure(figsize=plt.figaspect(0.5))
+    # if train_dataset.shape[1] <= 2: args.plots_3d = 0
+    # if bool(args.plots_3d) == True:
+    #     ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+    #     ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+    #     pca_components = 3
+    # else:
+    #     ax1 = fig.add_subplot(1, 2, 1)
+    #     ax2 = fig.add_subplot(1, 2, 2)
+    #     pca_components = 2
 
-    plot_PCA(ax1, train_dataset, train_dataset_labels, pca_components, args.soft, 'Dataset Clusters', random_state=args.seed)
-    plot_PCA(ax2, train_dataset, predicted_labels, pca_components, args.soft, 'Predicted Clusters', random_state=args.seed)
-    fig.savefig(dir_name, dpi=300)
-    plt.close(fig)
+    # plot_PCA(ax1, train_dataset, train_dataset_labels, pca_components, args.soft, 'Dataset Clusters', random_state=args.seed)
+    # plot_PCA(ax2, train_dataset, predicted_labels, pca_components, args.soft, 'Predicted Clusters', random_state=args.seed)
+    # fig.savefig(dir_name, dpi=300)
+    # plt.close(fig)
 
     print('Done.')
