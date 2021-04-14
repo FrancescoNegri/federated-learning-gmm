@@ -133,7 +133,10 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
         dir_name = os.path.join(output_dir, path)
         os.makedirs(dir_name, exist_ok=True)
 
-        filename = 'init' if iteration is None else filename = '{}_{}'.format(filename, iteration+1)
+        if iteration is None:
+            filename = 'init'
+        else:
+            filename = '{}_{}'.format(filename, iteration+1)
         dir_name = os.path.join(dir_name, filename)
 
         fig = plt.figure(figsize=plt.figaspect(0.5))
