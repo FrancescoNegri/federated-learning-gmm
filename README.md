@@ -21,6 +21,7 @@ The Gaussian Mixture Model is employed in unsupervised learning problems, especi
 | `--rounds` | Number of rounds of training. | _10_ |  | X |
 | `--K` | Total number of clients. | _100_ |  | X |
 | `--C` | Fraction of clients to employ in each round. From 0 to 1. | _0.1_ |  | X |
+| `--S` | Number of shards for each client. If None data are assumed to be IID, otherwise are non-IID. | _None_ |  | X |
 
 ## Datasets
 

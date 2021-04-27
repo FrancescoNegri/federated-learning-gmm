@@ -32,6 +32,9 @@ def parse_federated(parser):
     parser.add_argument(
         '--C', type=float, default=0.1, help='Fraction of clients to employ in each round. From 0 to 1.'
     )
+    parser.add_argument(
+        '--S', type=int, default=None, help='Number of shards for each client. If None data are assumed to be IID, otherwise are non-IID.'
+    )
 
     return
 

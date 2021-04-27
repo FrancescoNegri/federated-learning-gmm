@@ -64,8 +64,11 @@ def get_dataset(args):
         train_dataset_labels = labels
         
         clients_groups = None
-        # if hasattr(args, 'K'): clients_groups = sample_non_iid(train_dataset, args.K, shards_per_client=5)
-        if hasattr(args, 'K'): clients_groups = sample_iid(train_dataset, args.K)
+        if hasattr(args, 'K'):
+            if hasattr(args, 'S') and args.S is not None:
+                clients_groups = sample_non_iid(train_dataset, args.K, shards_per_client=5)
+            else: 
+                clients_groups = sample_iid(train_dataset, args.K)
 
     # elif args.dataset == 'custom':
     #     if args.path:
@@ -202,7 +205,8 @@ def print_configuration(args, dataset, is_federated):
     print(f'Dataset: {args.dataset}')
     print(f'\tFeatures: {dataset.shape[1]}')
     print(f'\tInstances: {dataset.shape[0]}')
-    print(f'\tPartition: IID') if is_federated else print(f'\tPartition: NULL')
+    partition_type = 'non-IID' if (hasattr(args, 'S') and args.S is not None) else 'IID'
+    print(f'\tPartition: {partition_type}') if is_federated else print(f'\tPartition: NULL')
     print(f'Initialization: {args.init}')
     print(f'Random Seed: {args.seed}')
     print(f'Plots: 3D') if bool(args.plots_3d) else print(f'Plots: 2D')
@@ -228,6 +232,8 @@ def print_configuration(args, dataset, is_federated):
 def save_configuration(args, dataset, output_dir, is_federated):
     output_dir = str(output_dir).split('\\')[-1]
 
+    partition_type = 'non-IID' if (hasattr(args, 'S') and args.S is not None) else 'IID'
+
     configuration = {
         'execution_time': output_dir,
         'mode': 'FEDERATED' if is_federated else 'BASELINE',
@@ -237,7 +243,7 @@ def save_configuration(args, dataset, output_dir, is_federated):
             'name': args.dataset,
             'features': dataset.shape[1],
             'instances': dataset.shape[0],
-            'partition': 'IID' if is_federated else 'null',
+            'partition': partition_type if is_federated else 'null',
         },
         'initialization': args.init,
         'random_seed': args.seed,
