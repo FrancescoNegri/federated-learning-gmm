@@ -2,17 +2,45 @@
 # -*- coding: utf-8 -*-
 # Python version: 3.6
 
-
+import math
 import numpy as np
 from torchvision import datasets, transforms
 
 def sample_iid(dataset, n_clients):
-    num_items = int(len(dataset) / n_clients)
+    n_samples = int(len(dataset) / n_clients)
     clients_groups, all_idxs = {}, [i for i in range(len(dataset))]
     
     for i in range(n_clients):
-        clients_groups[i] = set(np.random.choice(all_idxs, num_items, replace=False))
+        clients_groups[i] = set(np.random.choice(all_idxs, n_samples, replace=False))
         all_idxs = list(set(all_idxs) - clients_groups[i])
+
+    return clients_groups
+
+def sample_non_iid(dataset, n_clients, shards_per_client = 2):
+
+    # shards per client
+    shards_per_client = shards_per_client
+    n_shards = n_clients * shards_per_client
+    n_samples = math.floor(len(dataset) / n_shards)
+
+    shards_idxs = [i for i in range(n_shards)]
+    clients_groups = {i: np.array([]) for i in range(n_clients)}
+    idxs = np.arange(n_shards * n_samples)
+    print(idxs)
+
+    for client_idx in range(n_clients):
+        # Pick randomly the n shards for this client
+        client_shards_idxs = np.random.choice(shards_idxs, shards_per_client, replace=False)
+        # Remove the selected n shards from the available ones
+        shards_idxs = list(set(shards_idxs) - set(client_shards_idxs))
+        
+        for shard_idx in set(client_shards_idxs):
+            clients_groups[client_idx] = np.concatenate(
+                (clients_groups[client_idx], idxs[shard_idx * n_samples : (shard_idx + 1) * n_samples]), 
+                axis=0
+            )
+
+        clients_groups[client_idx] = clients_groups[client_idx].astype(int)
 
     return clients_groups
 

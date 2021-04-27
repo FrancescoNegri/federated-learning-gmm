@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import torch
 from datetime import datetime
 from tqdm import tqdm
-from sampling import sample_iid
+from sampling import sample_iid, sample_non_iid
 from sklearn import datasets, preprocessing
 from sklearn.decomposition import PCA
 import numpy as np
@@ -49,7 +49,8 @@ def get_dataset(args):
             n_samples=args.samples,
             n_features=args.features,
             centers=args.components,
-            random_state=seed
+            random_state=seed,
+            shuffle=False
         )
 
         scaler = preprocessing.StandardScaler()
@@ -63,6 +64,7 @@ def get_dataset(args):
         train_dataset_labels = labels
         
         clients_groups = None
+        # if hasattr(args, 'K'): clients_groups = sample_non_iid(train_dataset, args.K, shards_per_client=5)
         if hasattr(args, 'K'): clients_groups = sample_iid(train_dataset, args.K)
 
     # elif args.dataset == 'custom':
