@@ -49,9 +49,9 @@ class Server():
         for client_id in round_history:
             parameters = round_history[client_id]['parameters']
 
-            self.clients_means.append(parameters['means'])
-            self.clients_covariances.append(parameters['covariances'])
-            self.clients_weights.append(parameters['weights'])
+            self.clients_means.append(parameters['means'][-1])
+            self.clients_covariances.append(parameters['covariances'][-1])
+            self.clients_weights.append(parameters['weights'][-1])
 
         self.clients_means = np.array(self.clients_means)
         self.clients_covariances = np.array(self.clients_covariances)
@@ -67,9 +67,9 @@ class Server():
         for client_id in round_history:
             metrics = round_history[client_id]['metrics']
 
-            self.clients_aic.append(metrics['aic'])
-            self.clients_bic.append(metrics['bic'])
-            self.clients_ll.append(metrics['ll'])
+            self.clients_aic.append(metrics['aic'][-1])
+            self.clients_bic.append(metrics['bic'][-1])
+            self.clients_ll.append(metrics['ll'][-1])
 
         self.clients_aic = np.array(self.clients_aic)
         self.clients_bic = np.array(self.clients_bic)
@@ -98,9 +98,9 @@ class Server():
     def average_clients_models(self):
         gamma = 1 / self.n_clients_round # weight for each client (the same)
         
-        [self.avg_clients_means] = np.sum(self.clients_means * pow(gamma, 1), axis=0)
-        [self.avg_clients_covariances] = np.sum(self.clients_covariances * pow(gamma, 2), axis=0)
-        [self.avg_clients_weights] = np.sum(self.clients_weights * pow(gamma, 1), axis=0)
+        self.avg_clients_means = np.sum(self.clients_means * pow(gamma, 1), axis=0)
+        self.avg_clients_covariances = np.sum(self.clients_covariances * pow(gamma, 2), axis=0)
+        self.avg_clients_weights = np.sum(self.clients_weights * pow(gamma, 1), axis=0)
         
         self.avg_clients_precisions_cholesky = self.model.compute_precision_cholesky(self.avg_clients_covariances, self.model.covariance_type)
         
