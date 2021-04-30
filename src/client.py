@@ -9,8 +9,8 @@ class Client():
             self.dataset.append(global_dataset[idx].tolist())
         self.dataset = np.array(self.dataset)
 
-    def fit(self, global_model):
+    def fit(self, global_model, local_epochs:int = 1):
         local_model = copy.deepcopy(global_model)
-        local_model.fit(self.dataset, epochs=1)
+        local_model.fit(self.dataset, epochs=local_epochs)
 
         return local_model.history_
