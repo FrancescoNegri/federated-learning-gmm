@@ -49,7 +49,7 @@ def parse_common(parser):
         '--seed', default=None, help="Number to have random consistent results across executions."
     )
     parser.add_argument(
-        '--init', type=str, default='kmeans', help="Model initialization method: random or kmeans."
+        '--init', type=str, default='random', help="Model initialization method: random or kmeans (over a fraction of the dataset)."
     )
     parser.add_argument(
         '--samples', type=int, default=10000, help="Number of samples to generate."
