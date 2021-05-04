@@ -48,6 +48,28 @@ def get_dataset(args):
             else: 
                 clients_groups = sample_iid(train_dataset, args.K)
 
+    elif args.dataset == 's1':
+        seed = None
+        if args.seed:
+            seed = int(args.seed)
+
+        path = '../data/s/s1.txt'
+        data = pd.read_csv(os.path.join(dir, path), header=None, delimiter='\t')
+
+        scaler = preprocessing.StandardScaler()
+        scaler.fit(data)
+        data = scaler.transform(data)
+        train_dataset = torch.Tensor(data)
+
+        train_dataset_labels = np.ones((train_dataset.shape[0], 1))
+        
+        clients_groups = None
+        if hasattr(args, 'K'):
+            if hasattr(args, 'S') and args.S is not None:
+                clients_groups = sample_non_iid(train_dataset, args.K, shards_per_client=5)
+            else: 
+                clients_groups = sample_iid(train_dataset, args.K)
+
     return train_dataset, train_dataset_labels, clients_groups
 
 def print_configuration(args, dataset, is_federated):
