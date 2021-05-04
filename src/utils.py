@@ -94,7 +94,7 @@ def print_configuration(args, dataset, is_federated):
     if is_federated:
         # Federated
         print(f'Rounds: {args.rounds}')
-        print(f'\tLocal Epochs: 1')
+        print(f'\tLocal Epochs: {args.local_epochs}')
         print(f'Clients: {args.K}')
         print(f'\tClients fraction: {args.C * 100}%')
         print(f'\tClients per round: {int(args.K * args.C)}')
@@ -136,7 +136,7 @@ def save_configuration(args, dataset, output_dir, is_federated):
         # Federated
         configuration['dataset']['data_instances_per_client'] = int(dataset.shape[0] / args.K)
         configuration['rounds'] = args.rounds
-        configuration['local_epochs'] = 1
+        configuration['local_epochs'] = args.local_epochs
         configuration['clients'] = {
             'total': args.K,
             'round_fraction_perc': str(args.C * 100) + '%',

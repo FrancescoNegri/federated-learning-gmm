@@ -19,6 +19,7 @@ The Gaussian Mixture Model is employed in unsupervised learning problems, especi
 | `--plots_step` | Specifies the number of rounds or epochs after which saving a plot. | _1_ | X | X |
 | `--epochs` | Number of epochs of training. | _100_ | X |  |
 | `--rounds` | Number of rounds of training. | _100_ |  | X |
+| `--local_epochs` | Number of local epochs for each client at every round. | _10_ |  | X |
 | `--K` | Total number of clients. | _100_ |  | X |
 | `--C` | Fraction of clients to employ in each round. From 0 to 1. | _0.1_ |  | X |
 | `--S` | Number of shards for each client. If None data are assumed to be IID, otherwise are non-IID. | _None_ |  | X |

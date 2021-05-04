@@ -45,7 +45,7 @@ class Server():
         self.clients_means = []
         self.clients_covariances = []
         self.clients_weights = []
-        
+
         for client_id in round_history:
             parameters = round_history[client_id]['parameters']
 
@@ -85,7 +85,7 @@ class Server():
         pbar = tqdm(selected_clients)
         for client in pbar:
             pbar.set_description('Round: {}/{} | Client: {}'.format(round+1, self.rounds, client.id))
-            round_history[client.id] = client.fit(self.model)
+            round_history[client.id] = client.fit(self.model, self.args.local_epochs)
 
             if pbar.iterable[-1] == client:
                 pbar.set_description('Round: {}/{} | Completed'.format(round+1, self.rounds))
