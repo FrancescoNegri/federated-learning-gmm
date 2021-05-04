@@ -3,6 +3,7 @@ import numpy as np
 from tqdm import tqdm
 
 from gmm import GaussianMixture
+from hellinger import NormalDistribution, get_hellinger_multivariate
 
 class Server():
     def __init__(self, args, init_dataset, clients, output_dir):
@@ -95,7 +96,71 @@ class Server():
 
         return
 
-    def average_clients_models(self):
+    def _sort_clients_distributions(self, update_reference:bool = False):
+        reference_distributions = []
+        
+        for component_idx in range(self.args.components):
+            client_idx = 0 # First client
+            distribution = NormalDistribution(self.clients_means[client_idx][component_idx], self.clients_covariances[client_idx][component_idx])
+            reference_distributions.append(distribution)
+
+        for client_idx in range(1, self.n_clients_round):
+            selected_components_idxs = []
+
+            for component_idx in range(self.args.components):
+                distances = []
+                distances_idxs = []
+
+                for target_component_idx in range(self.args.components):
+                    if target_component_idx in selected_components_idxs:
+                        pass
+                    else:
+                        means = self.clients_means[client_idx][target_component_idx]
+                        covariances = self.clients_covariances[client_idx][target_component_idx]
+                        target_distribution = NormalDistribution(means, covariances)
+                        
+                        distance = get_hellinger_multivariate(reference_distributions[component_idx], target_distribution)
+                        distances.append(distance)
+                        distances_idxs.append(target_component_idx)
+
+                min_idx = np.argmin(distances)
+                selected_components_idxs.append(distances_idxs[min_idx])
+            
+            selected_components_idxs = np.array(selected_components_idxs)
+            self.clients_means[client_idx] = self.clients_means[client_idx][selected_components_idxs]
+            self.clients_covariances[client_idx] = self.clients_covariances[client_idx][selected_components_idxs]
+            self.clients_weights[client_idx] = self.clients_weights[client_idx][selected_components_idxs]
+
+            if update_reference is True:
+                avg_means = []
+                reference_means = [reference_distributions[component_idx].means for component_idx in range(self.args.components)]
+                avg_means.append(np.array(reference_means))
+                avg_means.append(np.array(self.clients_means[client_idx]))
+                avg_means = np.array(avg_means)
+
+                avg_covariances = []
+                reference_covariances = [reference_distributions[component_idx].covariances for component_idx in range(self.args.components)]
+                avg_covariances.append(np.array(reference_covariances))
+                avg_covariances.append(np.array(self.clients_covariances[client_idx]))
+                avg_covariances = np.array(avg_covariances)
+                
+                gamma = 1 / avg_means.shape[0]
+
+                avg_means = np.sum(avg_means * pow(gamma, 1), axis=0)
+                avg_covariances = np.sum(avg_covariances * pow(gamma, 2), axis=0)
+
+                reference_distributions = []
+                for component_idx in range(self.args.components):
+                    distribution = NormalDistribution(avg_means[component_idx], avg_covariances[component_idx])
+                    reference_distributions.append(distribution)
+
+        return 
+    
+    def average_clients_models(self, use_hellinger_distance:bool = True, update_reference:bool = False):
+        
+        if use_hellinger_distance is True:
+            self._sort_clients_distributions(update_reference)
+        
         gamma = 1 / self.n_clients_round # weight for each client (the same)
         
         self.avg_clients_means = np.sum(self.clients_means * pow(gamma, 1), axis=0)

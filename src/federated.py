@@ -37,7 +37,7 @@ if __name__ == '__main__':
     server.plot(train_dataset, train_dataset_labels)
     for round in range(args.rounds):
         server.start_round(round)
-        server.average_clients_models()
+        server.average_clients_models(use_hellinger_distance=True, update_reference=False)
         server.average_clients_metrics()
         server.update_server_model()
 
