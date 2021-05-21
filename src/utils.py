@@ -1,6 +1,5 @@
 import os
 import matplotlib.pyplot as plt
-import torch
 from datetime import datetime
 from sampling import sample_iid, sample_non_iid
 from sklearn import datasets, preprocessing
@@ -34,7 +33,7 @@ def get_dataset(args):
         scaler = preprocessing.StandardScaler()
         scaler.fit(data)
         data = scaler.transform(data)
-        train_dataset = torch.Tensor(data)
+        train_dataset = np.array(data)
 
         lb = preprocessing.LabelBinarizer()
         lb.fit(labels)
@@ -59,7 +58,7 @@ def get_dataset(args):
         scaler = preprocessing.StandardScaler()
         scaler.fit(data)
         data = scaler.transform(data)
-        train_dataset = torch.Tensor(data)
+        train_dataset = np.array(data)
 
         train_dataset_labels = np.ones((train_dataset.shape[0], 1))
         

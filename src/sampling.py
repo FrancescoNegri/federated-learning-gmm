@@ -1,10 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# Python version: 3.6
-
 import math
 import numpy as np
-from torchvision import datasets, transforms
+# from torchvision import datasets, transforms
 
 def sample_iid(dataset, n_clients):
     n_samples = int(len(dataset) / n_clients)

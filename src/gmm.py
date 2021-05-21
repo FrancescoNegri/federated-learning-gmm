@@ -1,16 +1,15 @@
 import os
-import sklearn.mixture
 import numpy as np
+import sklearn.mixture
 import matplotlib.pyplot as plt
-import torch
 from tqdm import tqdm
 from scipy import linalg
 
 import warnings
 from sklearn.exceptions import ConvergenceWarning
+warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
 from utils import plot_PCA
-warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
 
 class GaussianMixture(sklearn.mixture.GaussianMixture):
@@ -18,9 +17,6 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
     def __init__(self, X, n_components=3, covariance_type='full',
                  weights_init=None, means_init=None, precisions_init=None, covariances_init=None,
                  init_params='kmeans', tol=1e-3, random_state=None, is_quiet=False):
-
-        if torch.is_tensor(X):
-            X = np.array(X.tolist())
 
         do_init = (weights_init is None) and (means_init is None) and (precisions_init is None) and (covariances_init is None)
         if do_init:
@@ -63,10 +59,6 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
         self._set_parameters(self._get_parameters())
 
     def fit(self, X, epochs=1, labels=None, args=None, output_dir=None):
-
-        if torch.is_tensor(X):
-            X = np.array(X.tolist())
-
         self.history_ = {
             'epochs': epochs,
             'converged': [],
