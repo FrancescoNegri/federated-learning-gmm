@@ -130,25 +130,52 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
         else:
             filename = '{}_{}'.format(filename, iteration+1)
         dir_name = os.path.join(dir_name, filename)
-
-        fig = plt.figure(figsize=plt.figaspect(0.5))
         
         if X.shape[1] <= 2:
             args.plots_3d = 0
 
-        if bool(args.plots_3d) == True:
+        if args.plots_3d == 2:
+            predicted_labels = self.predict(X)
+
+            #3D
+            fig = plt.figure(figsize=plt.figaspect(0.5))
             ax1 = fig.add_subplot(1, 2, 1, projection='3d')
             ax2 = fig.add_subplot(1, 2, 2, projection='3d')
             pca_components = 3
-        else:
+
+            plot_PCA(ax1, X, labels, pca_components, args.soft, 'Ground Truth', random_state=self.random_state)
+            plot_PCA(ax2, X, predicted_labels, pca_components, args.soft, 'Predicted Clusters', random_state=self.random_state)
+            dir_name_3d = dir_name + '_3d'
+            fig.savefig(dir_name_3d, dpi=150)
+            plt.close(fig)
+            
+            #2D
+            fig = plt.figure(figsize=plt.figaspect(0.5))
             ax1 = fig.add_subplot(1, 2, 1)
             ax2 = fig.add_subplot(1, 2, 2)
             pca_components = 2
 
-        plot_PCA(ax1, X, labels, pca_components, args.soft, 'Dataset Clusters', random_state=self.random_state)
-        plot_PCA(ax2, X, self.predict(X), pca_components, args.soft, 'Predicted Clusters', random_state=self.random_state)
-        fig.savefig(dir_name, dpi=150)
-        plt.close(fig)
+            plot_PCA(ax1, X, labels, pca_components, args.soft, 'Ground Truth', random_state=self.random_state)
+            plot_PCA(ax2, X, predicted_labels, pca_components, args.soft, 'Predicted Clusters', random_state=self.random_state)
+            dir_name_2d = dir_name + '_2d'
+            fig.savefig(dir_name_2d, dpi=150)
+            plt.close(fig)
+        else:
+            fig = plt.figure(figsize=plt.figaspect(0.5))
+
+            if bool(args.plots_3d) == True:
+                ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+                ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+                pca_components = 3
+            else:
+                ax1 = fig.add_subplot(1, 2, 1)
+                ax2 = fig.add_subplot(1, 2, 2)
+                pca_components = 2
+
+            plot_PCA(ax1, X, labels, pca_components, args.soft, 'Ground Truth', random_state=self.random_state)
+            plot_PCA(ax2, X, self.predict(X), pca_components, args.soft, 'Predicted Clusters', random_state=self.random_state)
+            fig.savefig(dir_name, dpi=150)
+            plt.close(fig)
 
         return
 
