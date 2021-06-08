@@ -24,7 +24,7 @@ def parse_baseline(parser):
 
 def parse_federated(parser):
     parser.add_argument(
-        '--rounds', type=int, default=10, help='Number of rounds of training.'
+        '--rounds', type=int, default=100, help='Number of rounds of training.'
     )
     parser.add_argument(
         '--local_epochs', type=int, default=10, help='Number of local epochs for each client at every round.'
@@ -43,7 +43,7 @@ def parse_federated(parser):
 
 def parse_common(parser):
     parser.add_argument(
-        '--dataset', type=str, default='iris', help='Name of the dataset.'
+        '--dataset', type=str, default='blob', help='Name of the dataset.'
     )
     parser.add_argument(
         '--components', type=int, default=3, help='Number of Gaussians to fit.'
