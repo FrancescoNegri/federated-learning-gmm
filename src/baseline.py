@@ -27,8 +27,9 @@ if __name__ == '__main__':
     if args.seed: seed = (int(args.seed))
 
     # Prepare server --> init_dataset is given by 0.5% of the train_dataset randomly sampled
-    init_dataset_size = int(train_dataset.shape[0] * 0.005)
-    init_dataset = train_dataset[np.random.choice(train_dataset.shape[0], init_dataset_size, replace=False)]
+    # init_dataset_size = int(train_dataset.shape[0] * 0.005)
+    # init_dataset = train_dataset[np.random.choice(train_dataset.shape[0], init_dataset_size, replace=False)]
+    init_dataset = train_dataset
 
     model = GaussianMixture(
         X=init_dataset,
