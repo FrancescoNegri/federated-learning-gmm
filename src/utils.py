@@ -47,12 +47,12 @@ def get_dataset(args):
             else: 
                 clients_groups = sample_iid(train_dataset, args.K)
 
-    elif args.dataset == 's1':
+    else:
         seed = None
         if args.seed:
             seed = int(args.seed)
 
-        path = '../data/s/s1.txt'
+        path = '../data/s/'+ args.dataset +'.txt'
         data = pd.read_csv(os.path.join(dir, path), header=None, delimiter='\t')
 
         scaler = preprocessing.StandardScaler()
